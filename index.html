@@ -1,224 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anugrah Ajith — Systems Thinker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96@300;600&family=Instrument+Serif:ital@0;1&display=swap');
+  :root {
+    --bg:    #0a0a0a;
+    --bg2:   #111111;
+    --fg:    #e8e4dc;
+    --dim:   #6b6660;
+    --accent:#c8f03a;
+    --red:   #ff4d3e;
+    --card:  #141414;
+    --border:#232320;
+    --mono:  'Space Mono', monospace;
+    --sans:  'Syne', sans-serif;
+    --serif: 'DM Serif Display', serif;
+  }
 
-:root {
-  --bg: #F3F2EE; /* Pantone Whisper White */
-  --fg: #272727; /* Pantone Ebony */
-  --accent: #AD8B63; /* Pantone Copper Tan */
-  --muted: #E5E2DA;
-}
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    cursor: none;
+  }
 
-html { scroll-behavior: smooth; }
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
 
-body {
-  background-color: var(--bg);
-  color: var(--fg);
-  font-family: 'Bricolage Grotesque', sans-serif;
-  line-height: 1.6;
-  cursor: none; 
-}
+  /* ─── CUSTOM CURSOR ─── */
+  #cursor-dot {
+    position: fixed; width: 8px; height: 8px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s, height 0.3s, background 0.3s;
+  }
+  #cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid rgba(200, 240, 58, 0.4); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+  }
+  body.hovering #cursor-dot  { width: 12px; height: 12px; background: #fff; }
+  body.hovering #cursor-ring { width: 56px; height: 56px; border-color: var(--accent); opacity: 0.6; }
+  body.clicking #cursor-dot  { transform: translate(-50%, -50%) scale(0.6); }
 
-/* CUSTOM CURSOR */
-#cursor {
-  position: fixed; width: 12px; height: 12px; background: var(--accent);
-  border-radius: 50%; pointer-events: none; z-index: 9999;
-  transition: transform 0.15s ease-out; mix-blend-mode: multiply;
-}
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); }
 
-/* ANIMATION: FADE IN ON SCROLL */
-.reveal {
-  opacity: 0; transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-}
-.reveal.active { opacity: 1; transform: translateY(0); }
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.4rem 3.5rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--mono); font-size: 0.75rem;
+    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .nav-logo span { color: var(--dim); }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a {
+    text-decoration: none; color: var(--dim); font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase; font-family: var(--mono);
+    transition: color 0.25s;
+    position: relative;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links .nav-cta {
+    color: var(--bg); background: var(--accent);
+    padding: 0.45rem 1.1rem; border-radius: 2px; font-weight: 700;
+    transition: opacity 0.2s;
+  }
+  .nav-links .nav-cta:hover { opacity: 0.85; color: var(--bg); }
 
-/* NAVIGATION */
-nav {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1.5rem 4rem; position: fixed; top: 0; width: 100%;
-  z-index: 100; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-.logo { font-family: 'Instrument Serif', serif; font-size: 1.4rem; font-style: italic; }
-.nav-links { display: flex; align-items: center; }
-.nav-links a { 
-    text-decoration: none; color: var(--fg); font-size: 0.75rem; 
-    letter-spacing: 0.1em; margin-left: 2rem; position: relative;
-    text-transform: uppercase;
-}
-.nav-links a::after {
-    content: ''; position: absolute; bottom: -4px; left: 0; width: 0%;
-    height: 1px; background: var(--accent); transition: 0.3s;
-}
-.nav-links a:hover::after { width: 100%; }
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-rows: 1fr auto;
+    padding: 0 3.5rem;
+    position: relative; overflow: hidden;
+  }
 
-/* HERO */
-.hero {
-  padding: 12rem 4rem 8rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem;
-}
-.hero h1 {
-  font-family: 'Instrument Serif', serif; font-size: clamp(3.5rem, 7vw, 6.5rem);
-  line-height: 0.9; font-weight: 400;
-}
-.hero h1 em { color: var(--accent); font-style: italic; }
-.hero-bio { font-size: 1.2rem; color: #555; max-width: 420px; align-self: flex-end; }
+  /* animated grid lines */
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    animation: gridpulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes gridpulse {
+    0%   { opacity: 0.4; background-size: 80px 80px; }
+    100% { opacity: 0.7; background-size: 88px 88px; }
+  }
 
-/* EXPERIENCE TILES */
-.section-label { padding: 4rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.4em; color: var(--accent); }
+  /* glowing orb */
+  .hero-orb {
+    position: absolute; top: 18%; right: 6%;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,240,58,0.14) 0%, rgba(200,240,58,0.04) 50%, transparent 70%);
+    pointer-events: none; animation: orb 6s ease-in-out infinite alternate;
+  }
+  @keyframes orb { 0% { transform: scale(1) translateY(0); } 100% { transform: scale(1.12) translateY(-20px); } }
 
-.exp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); border-top: 1px solid var(--muted); }
-.exp-item { 
-    padding: 4rem; border-right: 1px solid var(--muted); border-bottom: 1px solid var(--muted);
-    transition: background 0.4s ease;
-}
-.exp-item:hover { background: #fff; }
-.exp-date { font-size: 0.75rem; color: var(--accent); margin-bottom: 1rem; display: block; }
-.exp-title { font-family: 'Instrument Serif', serif; font-size: 2.2rem; margin-bottom: 0.5rem; }
-.exp-org { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem; display: block; }
+  .hero-content {
+    display: flex; flex-direction: column; justify-content: center;
+    padding-top: 9rem; position: relative; z-index: 2;
+  }
+  .hero-tag {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--accent);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 2.2rem; display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-tag::before {
+    content: ''; display: block; width: 40px; height: 1px; background: var(--accent);
+  }
 
-/* FOOTER */
-footer { padding: 8rem 4rem; border-top: 1px solid var(--muted); }
-.footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4rem; }
-.footer-cta { font-family: 'Instrument Serif', serif; font-size: clamp(3rem, 8vw, 8rem); text-decoration: none; color: var(--fg); line-height: 1; }
-.footer-cta:hover { color: var(--accent); font-style: italic; }
+  .hero-name {
+    font-family: var(--serif); font-size: clamp(4.5rem, 10vw, 9.5rem);
+    font-weight: 400; line-height: 0.88; letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+  .hero-name .line2 { font-style: italic; color: var(--accent); }
 
-.social-stack { display: flex; flex-direction: column; gap: 0.5rem; text-align: right; }
-.social-link { 
-    text-decoration: none; color: var(--fg); font-size: 0.9rem; 
-    letter-spacing: 0.05em; transition: color 0.3s;
-}
-.social-link:hover { color: var(--accent); }
+  .hero-bottom {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border); padding: 2.5rem 0;
+    position: relative; z-index: 2; gap: 4rem;
+  }
+  .hero-desc {
+    font-size: 1rem; line-height: 1.75; color: var(--dim); max-width: 480px;
+  }
+  .hero-desc strong { color: var(--fg); font-weight: 500; }
+  .hero-stats { display: flex; align-items: center; justify-content: flex-end; gap: 3rem; }
+  .stat { text-align: right; }
+  .stat-num { font-family: var(--serif); font-size: 2.8rem; font-style: italic; line-height: 1; }
+  .stat-label { font-family: var(--mono); font-size: 0.65rem; color: var(--dim); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.3rem; }
 
-@media (max-width: 768px) {
-  nav, .hero, footer { padding: 2rem; }
-  .hero { grid-template-columns: 1fr; padding-top: 8rem; }
-  .exp-grid { grid-template-columns: 1fr; }
-  .footer-top { flex-direction: column; gap: 2rem; }
-  .social-stack { text-align: left; }
-}
+  /* ─── SECTION STRUCTURE ─── */
+  section { padding: 8rem 3.5rem; position: relative; z-index: 1; }
+  .section-header {
+    display: flex; align-items: baseline; gap: 1.5rem;
+    margin-bottom: 5rem;
+  }
+  .section-num {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.2em;
+  }
+  .section-title {
+    font-family: var(--serif); font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 400;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+  .section-line {
+    flex: 1; height: 1px; background: var(--border); margin-left: 1rem;
+  }
+
+  /* ─── EXPERIENCE ─── */
+  #experience { border-top: 1px solid var(--border); }
+  .exp-list { display: flex; flex-direction: column; }
+  .exp-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+    gap: 3rem; align-items: start;
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+    transition: background 0.4s;
+  }
+  .exp-row::before {
+    content: ''; position: absolute; left: 0; bottom: 0;
+    height: 1px; width: 0; background: var(--accent);
+    transition: width 0.6s cubic-bezier(0.25,1,0.5,1);
+  }
+  .exp-row:hover::before { width: 100%; }
+  .exp-row:hover { background: rgba(200,240,58,0.025); }
+  .exp-year {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--dim);
+    letter-spacing: 0.1em; padding-top: 0.35rem;
+  }
+  .exp-role {
+    font-family: var(--serif); font-size: 1.9rem; font-weight: 400; line-height: 1.1;
+    margin-bottom: 0.6rem;
+  }
+  .exp-company {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .exp-desc { font-size: 0.9rem; color: var(--dim); line-height: 1.7; padding-top: 0.4rem; }
+  .exp-tag {
+    display: inline-block; font-family: var(--mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.25rem 0.6rem; border: 1px solid var(--border);
+    color: var(--dim); border-radius: 2px; margin-top: 1rem;
+  }
+  .exp-tag.current { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── PROJECTS ─── */
+  #projects { background: var(--bg2); }
+  .projects-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px; border: 1px solid var(--border);
+  }
+  .project-card {
+    background: var(--card); padding: 3rem 2.5rem;
+    border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+    text-decoration: none; color: inherit;
+    display: block;
+    transition: background 0.3s;
+  }
+  .project-card:last-child { border-right: none; }
+  .project-card:hover { background: #1a1a1a; }
+
+  /* animated corner accent */
+  .project-card::after {
+    content: '';
+    position: absolute; bottom: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid; border-width: 0 0 60px 60px;
+    border-color: transparent transparent var(--border) transparent;
+    transition: border-color 0.3s;
+  }
+  .project-card:hover::after { border-color: transparent transparent var(--accent) transparent; }
+
+  .project-num {
+    font-family: var(--mono); font-size: 0.6rem; color: var(--dim);
+    letter-spacing: 0.15em; margin-bottom: 3rem;
+  }
+  .project-title {
+    font-family: var(--serif); font-size: 1.7rem; line-height: 1.1;
+    margin-bottom: 0.8rem;
+  }
+  .project-stack {
+    font-family: var(--mono); font-size: 0.65rem; color: var(--accent);
+    letter-spacing: 0.1em; margin-bottom: 1.5rem;
+  }
+  .project-desc { font-size: 0.85rem; color: var(--dim); line-height: 1.7; }
+  .project-metric {
+    font-family: var(--serif); font-size: 2.2rem; font-style: italic;
+    color: var(--accent); margin-top: 2rem; line-height: 1;
+  }
+  .project-metric span { font-family: var(--mono); font-size: 0.7rem; color: var(--dim); font-style: normal; display: block; margin-top: 0.2rem; }
+  .project-arrow {
+    position: absolute; top: 2.5rem; right: 2.5rem;
+    width: 32px; height: 32px; border: 1px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; color: var(--dim);
+    transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
+  }
+  .project-card:hover .project-arrow {
+    background: var(--accent); border-color: var(--accent);
+    color: var(--bg); transform: rotate(45deg);
+  }
+
+  /* ─── ABOUT / PHILOSOPHY ─── */
+  #about { border-top: 1px solid var(--border); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start;
+  }
+  .about-quote {
+    font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3.2rem);
+    line-height: 1.2; font-weight: 400;
+  }
+  .about-quote em { font-style: italic; color: var(--accent); }
+  .about-body { }
+  .about-body p {
+    font-size: 0.95rem; color: var(--dim); line-height: 1.85;
+    margin-bottom: 1.5rem;
+  }
+  .about-body p strong { color: var(--fg); font-weight: 600; }
+  .skills-list {
+    display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.5rem;
+  }
+  .skill-pill {
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.35rem 0.9rem;
+    border: 1px solid var(--border); color: var(--dim);
+    border-radius: 2px; transition: border-color 0.2s, color 0.2s;
+  }
+  .skill-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 6rem 3.5rem 3rem;
+    position: relative; overflow: hidden;
+  }
+  .footer-bg-text {
+    position: absolute; top: -0.15em; left: -0.05em;
+    font-family: var(--serif); font-size: clamp(8rem, 18vw, 18rem);
+    font-weight: 400; font-style: italic;
+    color: transparent; -webkit-text-stroke: 1px var(--border);
+    white-space: nowrap; pointer-events: none; user-select: none; z-index: 0;
+    opacity: 0.5;
+  }
+  .footer-inner { position: relative; z-index: 1; }
+  .footer-label {
+    font-family: var(--mono); font-size: 0.65rem; color: var(--accent);
+    letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 1.5rem;
+  }
+  .footer-cta {
+    font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 400; line-height: 1; text-decoration: none; color: var(--fg);
+    display: block; transition: color 0.3s;
+    margin-bottom: 6rem;
+  }
+  .footer-cta:hover { color: var(--accent); font-style: italic; }
+  .footer-bottom {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid var(--border); padding-top: 2rem;
+  }
+  .footer-info { font-family: var(--mono); font-size: 0.68rem; color: var(--dim); line-height: 2; }
+  .footer-links { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+  .footer-links a {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--dim);
+    text-decoration: none; transition: color 0.2s; letter-spacing: 0.08em;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.35s; }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 1.2rem 0; overflow: hidden; white-space: nowrap;
+    background: var(--bg2);
+  }
+  .marquee-track {
+    display: inline-block; animation: marquee 28s linear infinite;
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--dim);
+  }
+  .marquee-track span { color: var(--accent); margin: 0 1.5rem; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.8rem; }
+    .nav-links { gap: 1.5rem; }
+    .hero { padding: 0 1.8rem; }
+    section { padding: 5rem 1.8rem; }
+    footer { padding: 4rem 1.8rem 2rem; }
+    .exp-row { grid-template-columns: 1fr; gap: 0.8rem; }
+    .exp-year { padding-top: 0; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card { border-right: none; border-bottom: 1px solid var(--border); }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .hero-bottom { grid-template-columns: 1fr; gap: 2rem; }
+    .hero-stats { justify-content: flex-start; }
+    #cursor-dot, #cursor-ring { display: none; }
+  }
+
+  /* ─── LOADING SCREEN ─── */
+  #loader {
+    position: fixed; inset: 0; background: var(--bg); z-index: 10000;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    gap: 1.5rem;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #loader.gone { opacity: 0; visibility: hidden; }
+  .loader-name {
+    font-family: var(--serif); font-size: 1.8rem; font-style: italic; color: var(--fg);
+    letter-spacing: 0.05em;
+  }
+  .loader-bar {
+    width: 180px; height: 1px; background: var(--border); position: relative; overflow: hidden;
+  }
+  .loader-bar::after {
+    content: ''; position: absolute; left: -100%; top: 0;
+    width: 100%; height: 100%; background: var(--accent);
+    animation: load 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes load { to { left: 0; } }
+  .loader-pct { font-family: var(--mono); font-size: 0.7rem; color: var(--dim); letter-spacing: 0.15em; }
 </style>
+</head>
+<body>
 
-<div id="cursor"></div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-name">Anugrah Ajith</div>
+  <div class="loader-bar"></div>
+  <div class="loader-pct" id="loader-pct">000</div>
+</div>
 
+<!-- CURSORS -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
 <nav>
-  <div class="logo">Anugrah Ajith</div>
+  <div class="nav-logo"><span>AA — </span>Portfolio 2026</div>
   <div class="nav-links">
-    <a href="#exp">Experience</a>
-    <a href="#projects">Projects</a> <a href="https://linkedin.com/in/anugrah-ajith-cs" target="_blank">LinkedIn</a>
-    <a href="https://github.com/NEOoo3" target="_blank">GitHub</a>
+    <a href="#experience">Work</a>
+    <a href="#projects">Builds</a>
+    <a href="#about">About</a>
+    <a href="mailto:anugrahajith777@gmail.com" class="nav-cta">Hire Me</a>
   </div>
 </nav>
 
-<section class="hero reveal">
-  <h1>Designing systems that <em>think</em> and interfaces that <em>resonate</em>.</h1>
-  <p class="hero-bio">
-    Final-year CS student at LPU. AI Evaluation Specialist at Scaler AI Labs. Harmonizing technical complexity with intuitive design.
-  </p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">CS Engineer · Kerala, India</div>
+    <h1 class="hero-name">
+      <span class="line1" id="hero-line1">Anugrah</span><br>
+      <span class="line2" id="hero-line2">Ajith.</span>
+    </h1>
+  </div>
+
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      Final-year CS student at <strong>LPU</strong>. AI Evaluation Specialist at <strong>Scaler AI Labs</strong>.
+      Building systems that think, interfaces that resonate, and pipelines that scale.
+      Harmonizing <strong>technical complexity</strong> with <strong>intuitive design</strong>.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Years Building</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">420k</div>
+        <div class="stat-label">Records Modelled</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0.95</div>
+        <div class="stat-label">R² Score</div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<div class="section-label" id="exp">Professional Trajectory</div>
-<div class="exp-grid">
-  <div class="exp-item reveal">
-    <span class="exp-date">Dec 2025 – PRESENT</span>
-    <h3 class="exp-title">AI Evaluation Specialist</h3>
-    <span class="exp-org">Scaler AI Labs</span>
-    <p>Developing SFT "Golden Responses" for LLM reasoning and architecting automated annotation pipelines.</p>
-  </div>
-  <div class="exp-item reveal">
-    <span class="exp-date">Mar 2026 – PRESENT</span>
-    <h3 class="exp-title">Business Development</h3>
-    <span class="exp-org">Acmegrade</span>
-    <p>Bridging technical product capabilities with market-driven user needs.</p>
-  </div>
-  <div class="exp-item reveal">
-    <span class="exp-date">Feb 2025 – Jul 2025</span>
-    <h3 class="exp-title">Senior AI Training</h3>
-    <span class="exp-org">Outlier (Scale AI)</span>
-    <p>Aligning frontier LLMs via RLHF and performing adversarial red-teaming for algorithmic reasoning.</p>
-  </div>
-  <div class="exp-item reveal">
-    <span class="exp-date">Jan 2025</span>
-    <h3 class="exp-title">Research Author</h3>
-    <span class="exp-org">Intl. OS Research Journals</span>
-    <p>Author of "Novel Users in Specific Domains," exploring specialized user behavior in OS environments.</p>
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    LLM Alignment <span>✦</span> RLHF Training <span>✦</span> XGBoost / SHAP <span>✦</span> FastAPI <span>✦</span> FFmpeg <span>✦</span> TensorFlow <span>✦</span> AI Evaluation <span>✦</span> Adaptive Streaming <span>✦</span> Red-Teaming <span>✦</span> Research Author <span>✦</span> System Design <span>✦</span> LLM Alignment <span>✦</span> RLHF Training <span>✦</span> XGBoost / SHAP <span>✦</span> FastAPI <span>✦</span> FFmpeg <span>✦</span> TensorFlow <span>✦</span> AI Evaluation <span>✦</span> Adaptive Streaming <span>✦</span> Red-Teaming <span>✦</span> Research Author <span>✦</span> System Design <span>✦</span>
   </div>
 </div>
 
-<div class="section-label" id="projects">Technical Builds</div>
-<div class="exp-grid">
-  <a href="https://github.com/NEOoo3/Air-Quality-Forecasting-API" target="_blank" style="text-decoration: none; color: inherit; display: block;">
-    <div class="exp-item reveal">
-      <span class="exp-date">OCT 2025</span>
-      <h3 class="exp-title">GeoAI: Air Quality Forecasting</h3>
-      <span class="exp-org">ML / XGBoost / SHAP</span>
-      <p>Achieved R² = 0.9579 across 420k+ records. Click to view the interactive source code and XAI implementation.</p>
-    </div>
-  </a>
-
-  <div class="exp-item reveal">
-    <span class="exp-date">JAN 2026</span>
-    <h3 class="exp-title">Distributed HLS Streaming</h3>
-    <span class="exp-org">FastAPI / FFmpeg</span>
-    <p>Adaptive bitrate streaming service for high-density video delivery and real-time transcoding workflows.</p>
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header reveal">
+    <div class="section-num">01</div>
+    <h2 class="section-title">Professional <em>Trajectory</em></h2>
+    <div class="section-line"></div>
   </div>
 
-  <div class="exp-item reveal">
-    <span class="exp-date">JAN 2025</span>
-    <h3 class="exp-title">ML Behavioural Security</h3>
-    <span class="exp-org">Scikit-learn / TensorFlow</span>
-    <p>ML-based anomaly detection prototype identifying browsing-based threats and zero-day attack patterns.</p>
-  </div>
-</div>
+  <div class="exp-list">
+    <div class="exp-row reveal">
+      <div class="exp-year">Dec 2025 — Present</div>
+      <div>
+        <div class="exp-role">AI Evaluation Specialist</div>
+        <div class="exp-company">Scaler AI Labs</div>
+      </div>
+      <div>
+        <p class="exp-desc">Developing SFT "Golden Responses" for LLM reasoning benchmarks and architecting automated annotation pipelines that ensure frontier-model alignment at scale.</p>
+        <span class="exp-tag current">Current</span>
+      </div>
+    </div>
 
-<footer class="reveal">
-  <div class="footer-top">
-    <div>
-      <p style="font-size:0.7rem; letter-spacing:0.3em; margin-bottom:1rem; color: var(--accent);">STAY CONNECTED</p>
-      <a href="mailto:anugrahajith777@gmail.com" class="footer-cta">Get in touch.</a>
+    <div class="exp-row reveal reveal-delay-1">
+      <div class="exp-year">Mar 2026 — Present</div>
+      <div>
+        <div class="exp-role">Business Development</div>
+        <div class="exp-company">Acmegrade</div>
+      </div>
+      <div>
+        <p class="exp-desc">Bridging technical product capabilities with market-driven user needs — translating complex AI features into compelling value propositions.</p>
+        <span class="exp-tag current">Current</span>
+      </div>
     </div>
-    <div class="social-stack">
-      <a href="https://linkedin.com/in/anugrah-ajith-cs" class="social-link" target="_blank">LinkedIn</a>
-      <a href="https://github.com/NEOoo3" class="social-link" target="_blank">GitHub</a>
-      <a href="tel:+917888359259" class="social-link">+91 78883 59259</a>
+
+    <div class="exp-row reveal reveal-delay-2">
+      <div class="exp-year">Feb 2025 — Jul 2025</div>
+      <div>
+        <div class="exp-role">Senior AI Trainer</div>
+        <div class="exp-company">Outlier (Scale AI)</div>
+      </div>
+      <div>
+        <p class="exp-desc">Aligning frontier LLMs via RLHF and performing adversarial red-teaming for algorithmic reasoning — shaping how the next generation of AI systems behave.</p>
+        <span class="exp-tag">Completed</span>
+      </div>
+    </div>
+
+    <div class="exp-row reveal reveal-delay-3">
+      <div class="exp-year">Jan 2025</div>
+      <div>
+        <div class="exp-role">Research Author</div>
+        <div class="exp-company">Intl. OS Research Journals</div>
+      </div>
+      <div>
+        <p class="exp-desc">Published "Novel Users in Specific Domains" — an exploration of specialized user behaviour patterns in OS environments, bridging HCI theory with practical systems design.</p>
+        <span class="exp-tag">Published</span>
+      </div>
     </div>
   </div>
-  <div style="margin-top: 4rem; display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em;">
-    <span>© 2026 ALAPPUZHA, KERALA</span>
-    <span>SDE & PRODUCT DESIGNER</span>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header reveal">
+    <div class="section-num">02</div>
+    <h2 class="section-title">Technical <em>Builds</em></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="projects-grid">
+    <a class="project-card reveal" href="https://github.com/NEOoo3/Air-Quality-Forecasting-API" target="_blank">
+      <div class="project-arrow">↗</div>
+      <div class="project-num">Project / 001</div>
+      <h3 class="project-title">GeoAI: Air Quality Forecasting</h3>
+      <div class="project-stack">XGBoost · SHAP · Python</div>
+      <p class="project-desc">Predictive air-quality model trained on 420,000+ geospatial records with full explainability via SHAP values. Production API with real-time inference.</p>
+      <div class="project-metric">0.9579 <span>R² Score</span></div>
+    </a>
+
+    <div class="project-card reveal reveal-delay-1">
+      <div class="project-arrow" style="cursor:default">—</div>
+      <div class="project-num">Project / 002</div>
+      <h3 class="project-title">Distributed HLS Streaming</h3>
+      <div class="project-stack">FastAPI · FFmpeg · HLS</div>
+      <p class="project-desc">Adaptive bitrate streaming service supporting high-density video delivery and real-time transcoding workflows. Handles concurrent session scaling gracefully.</p>
+      <div class="project-metric">ABR <span>Adaptive Bitrate Engine</span></div>
+    </div>
+
+    <div class="project-card reveal reveal-delay-2">
+      <div class="project-arrow" style="cursor:default">—</div>
+      <div class="project-num">Project / 003</div>
+      <h3 class="project-title">ML Behavioural Security</h3>
+      <div class="project-stack">Scikit-learn · TensorFlow</div>
+      <p class="project-desc">Anomaly detection prototype that identifies browsing-based threats and zero-day attack patterns using behavioural signals rather than signature matching.</p>
+      <div class="project-metric">0-day <span>Pattern Detection</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-num">03</div>
+    <h2 class="section-title">Philosophy &amp; <em>Stack</em></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-quote reveal">
+      "I don't build features — I build systems that <em>earn trust</em> and interfaces that <em>feel inevitable</em>."
+    </div>
+    <div class="about-body reveal reveal-delay-1">
+      <p>
+        I'm a final-year Computer Science student at Lovely Professional University, currently working as an <strong>AI Evaluation Specialist</strong> at Scaler AI Labs — where I shape how frontier language models reason, align, and behave.
+      </p>
+      <p>
+        My work sits at the intersection of <strong>machine learning</strong>, <strong>systems engineering</strong>, and <strong>product intuition</strong>. Whether it's crafting SFT golden responses, building XAI pipelines, or architecting adaptive media systems — I'm drawn to problems where elegance and rigor have to coexist.
+      </p>
+      <p>
+        I believe the best engineers are also designers — people who obsess over how something <strong>feels</strong> as much as how it <strong>works</strong>.
+      </p>
+      <div class="skills-list">
+        <span class="skill-pill">Python</span>
+        <span class="skill-pill">XGBoost</span>
+        <span class="skill-pill">TensorFlow</span>
+        <span class="skill-pill">FastAPI</span>
+        <span class="skill-pill">RLHF</span>
+        <span class="skill-pill">SHAP / XAI</span>
+        <span class="skill-pill">FFmpeg</span>
+        <span class="skill-pill">Scikit-learn</span>
+        <span class="skill-pill">LLM Alignment</span>
+        <span class="skill-pill">Red-Teaming</span>
+        <span class="skill-pill">HLS Streaming</span>
+        <span class="skill-pill">System Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-bg-text">Contact.</div>
+  <div class="footer-inner reveal">
+    <div class="footer-label">Let's Build Something</div>
+    <a href="mailto:anugrahajith777@gmail.com" class="footer-cta">Get in touch.</a>
+    <div class="footer-bottom">
+      <div class="footer-info">
+        <div>© 2026 Anugrah Ajith</div>
+        <div>Alappuzha, Kerala · India</div>
+        <div style="margin-top:0.5rem">SDE &amp; AI Specialist</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://linkedin.com/in/anugrah-ajith-cs" target="_blank">LinkedIn ↗</a>
+        <a href="https://github.com/NEOoo3" target="_blank">GitHub ↗</a>
+        <a href="tel:+917888359259">+91 78883 59259</a>
+        <a href="mailto:anugrahajith777@gmail.com">anugrahajith777@gmail.com</a>
+      </div>
+    </div>
   </div>
 </footer>
 
 <script>
-// CUSTOM CURSOR LOGIC
-const cursor = document.getElementById('cursor');
+/* ── LOADER ── */
+(function() {
+  const loader = document.getElementById('loader');
+  const pct    = document.getElementById('loader-pct');
+  let n = 0;
+  const iv = setInterval(() => {
+    n = Math.min(n + Math.floor(Math.random() * 18) + 4, 100);
+    pct.textContent = String(n).padStart(3, '0');
+    if (n >= 100) {
+      clearInterval(iv);
+      setTimeout(() => loader.classList.add('gone'), 300);
+    }
+  }, 60);
+})();
+
+/* ── CURSOR ── */
+const dot  = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
 document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
+  mx = e.clientX; my = e.clientY;
+  dot.style.left  = mx + 'px';
+  dot.style.top   = my + 'px';
 });
 
-// INTERACTIVE HOVER STATES
-document.querySelectorAll('a, .exp-item').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursor.style.transform = 'scale(4)';
-    cursor.style.mixBlendMode = 'difference';
-    cursor.style.background = '#fff';
-  });
-  el.addEventListener('mouseleave', () => {
-    cursor.style.transform = 'scale(1)';
-    cursor.style.mixBlendMode = 'multiply';
-    cursor.style.background = 'var(--accent)';
-  });
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a, button, .exp-row, .project-card, .skill-pill').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+});
+document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+document.addEventListener('mouseup',   () => document.body.classList.remove('clicking'));
+
+/* ── SCROLL REVEAL ── */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+revealEls.forEach(el => io.observe(el));
+
+/* ── SCRAMBLE TEXT HERO ── */
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+function scramble(el, finalText, duration = 900) {
+  const total = duration;
+  const frames = 28;
+  const interval = total / frames;
+  let frame = 0;
+  const timer = setInterval(() => {
+    const progress = frame / frames;
+    const revealedLen = Math.floor(progress * finalText.length);
+    let result = '';
+    for (let i = 0; i < finalText.length; i++) {
+      if (i < revealedLen || finalText[i] === ' ') {
+        result += finalText[i];
+      } else {
+        result += chars[Math.floor(Math.random() * chars.length)];
+      }
+    }
+    el.textContent = result;
+    frame++;
+    if (frame > frames) { el.textContent = finalText; clearInterval(timer); }
+  }, interval);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    scramble(document.getElementById('hero-line1'), 'Anugrah', 800);
+    setTimeout(() => scramble(document.getElementById('hero-line2'), 'Ajith.', 700), 300);
+  }, 1400);
 });
 
-// REVEAL ON SCROLL LOGIC
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) entry.target.classList.add('active');
-  });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* ── MARQUEE PAUSE ON HOVER ── */
+const track = document.querySelector('.marquee-track');
+track.parentElement.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+track.parentElement.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
 </script>
-
-
+</body>
+</html>
